@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LA Blueprint Donut Reveal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Colors and fonts taken from lablueprint.org */
+    :root {
+      --navy: #0b2538;
+      --navy-grid: #122d42;
+      --blue: #0078e8;
+      --blue-light: #c4e2ff;
+      --pink: #e83274;
+      --text: #2c3e50;
+      --muted: #7e8893;
+      --bg: #f8f8f8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Work Sans", sans-serif;
+      color: #fff;
+      background-color: var(--navy);
+      background-image:
+        linear-gradient(90deg, var(--navy-grid) 1px, transparent 0),
+        linear-gradient(180deg, var(--navy-grid) 1px, transparent 0);
+      background-size: 40px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    main {
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+
+    .half-circle {
+      width: 6em;
+      height: 3em;
+      margin: 0 auto 1.5rem;
+      border-radius: 6em 6em 0 0;
+      background-color: var(--pink);
+    }
+
+    h1 {
+      font-family: "Syne", sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 7vw, 2.75rem);
+      line-height: 1.1;
+      margin: 0 0 0.75rem;
+    }
+
+    .subtitle {
+      color: var(--blue-light);
+      margin: 0 0 2rem;
+    }
+
+    .card {
+      background: #fff;
+      color: var(--text);
+      border-radius: 3px;
+      padding: 2rem;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-family: "Syne", sans-serif;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    input {
+      width: 100%;
+      font: inherit;
+      color: var(--text);
+      padding: 0.75rem;
+      border: 1px solid var(--blue-light);
+      border-radius: 3px;
+      outline: none;
+    }
+
+    input:focus { border-color: var(--blue); }
+
+    button {
+      margin-top: 1rem;
+      width: 100%;
+      font-family: "Syne", sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+      background: var(--blue);
+      border: 1px solid var(--blue);
+      border-radius: 3px;
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s ease-out;
+    }
+
+    button:hover {
+      background: transparent;
+      color: var(--blue);
+    }
+
+    .error {
+      color: var(--pink);
+      margin: 0.75rem 0 0;
+      min-height: 1.25em;
+    }
+
+    /* Loading screen */
+    .loading { text-align: center; padding: 1rem 0; }
+
+    .donut {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 1.25rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, transparent 22%, var(--pink) 23%, var(--pink) 62%, #d9a066 63%);
+      animation: spin 1s linear infinite;
+    }
+
+    .donut span {
+      position: absolute;
+      width: 4px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading p {
+      font-family: "Syne", sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin: 0;
+    }
+
+    /* Reveal */
+    .reveal h2 {
+      font-family: "Syne", sans-serif;
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+
+    .members {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem;
+    }
+
+    .members li {
+      font-weight: 500;
+      font-size: 1.125rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-left: 4px solid var(--blue);
+      background: var(--bg);
+      opacity: 0;
+      transform: translateY(8px);
+      animation: pop 0.4s ease-out forwards;
+    }
+
+    @keyframes pop { to { opacity: 1; transform: none; } }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="half-circle"></div>
+    <h1>LA Blueprint Donut Reveal</h1>
+    <p class="subtitle">Find out who you're grabbing donuts with this round.</p>
+
+    <div class="card">
+      <form id="form">
+        <label for="name">Your name (as displayed on Slack)</label>
+        <input id="name" autocomplete="name" placeholder="e.g. Susie Kim" required>
+        <button type="submit">Submit</button>
+        <p class="error" id="error"></p>
+      </form>
+
+      <div class="loading hidden" id="loading">
+        <div class="donut" id="donut"></div>
+        <p>baking your donut...</p>
+      </div>
+
+      <div class="reveal hidden" id="reveal">
+        <h2 id="greeting"></h2>
+        <ul class="members" id="members"></ul>
+        <button type="button" id="again">Look up someone else</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const LOADING_MS = 2000;
+
+    const form = document.getElementById("form");
+    const input = document.getElementById("name");
+    const error = document.getElementById("error");
+    const loading = document.getElementById("loading");
+    const reveal = document.getElementById("reveal");
+    const greeting = document.getElementById("greeting");
+    const members = document.getElementById("members");
+
+    // Sprinkles on the loading donut
+    const sprinkleColors = ["#fff", "#c4e2ff", "#0078e8", "#ffd23f"];
+    const donut = document.getElementById("donut");
+    for (let i = 0; i < 12; i++) {
+      const s = document.createElement("span");
+      const angle = (i / 12) * 2 * Math.PI;
+      const r = 30;
+      s.style.left = 48 + r * Math.cos(angle) - 2 + "px";
+      s.style.top = 48 + r * Math.sin(angle) - 5 + "px";
+      s.style.background = sprinkleColors[i % sprinkleColors.length];
+      s.style.transform = `rotate(${i * 47}deg)`;
+      donut.appendChild(s);
+    }
+
+    const normalize = (s) => s.trim().replace(/\s+/g, " ").toLowerCase();
+
+    // Minimal CSV parser that handles quoted fields (Python's csv module quotes names with commas)
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], field = "", quoted = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (quoted) {
+          if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+          else if (c === '"') quoted = false;
+          else field += c;
+        } else if (c === '"') quoted = true;
+        else if (c === ",") { row.push(field); field = ""; }
+        else if (c === "\n" || c === "\r") {
+          if (c === "\r" && text[i + 1] === "\n") i++;
+          row.push(field); field = "";
+          if (row.some((f) => f.trim())) rows.push(row);
+          row = [];
+        } else field += c;
+      }
+      row.push(field);
+      if (row.some((f) => f.trim())) rows.push(row);
+      return rows.map((r) => r.map((f) => f.trim()).filter(Boolean));
+    }
+
+    async function loadGroups() {
+      const res = await fetch("pairings.csv", { cache: "no-store" });
+      if (!res.ok) throw new Error("Couldn't load pairings.csv");
+      return parseCSV(await res.text());
+    }
+
+    function show(el) {
+      for (const x of [form, loading, reveal]) x.classList.toggle("hidden", x !== el);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      error.textContent = "";
+      const query = normalize(input.value);
+      if (!query) return;
+
+      let groups;
+      try {
+        groups = await loadGroups();
+      } catch (err) {
+        error.textContent = "Couldn't load this round's groups. Try again in a bit.";
+        return;
+      }
+
+      const mine = groups.filter((g) => g.some((n) => normalize(n) === query));
+      if (mine.length === 0) {
+        error.textContent = "We couldn't find that name. Check that it matches your Slack display name.";
+        return;
+      }
+
+      show(loading);
+      await new Promise((r) => setTimeout(r, LOADING_MS));
+
+      const self = mine[0].find((n) => normalize(n) === query);
+      const others = mine.flatMap((g) => g.filter((n) => normalize(n) !== query));
+      greeting.textContent = `${self}, your donut group is...`;
+      members.replaceChildren(...others.map((n, i) => {
+        const li = document.createElement("li");
+        li.textContent = n;
+        li.style.animationDelay = `${i * 0.15}s`;
+        return li;
+      }));
+      show(reveal);
+    });
+
+    document.getElementById("again").addEventListener("click", () => {
+      input.value = "";
+      show(form);
+      input.focus();
+    });
+  </script>
+</body>
+</html>
